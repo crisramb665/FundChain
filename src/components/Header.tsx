@@ -8,48 +8,53 @@ interface HeaderProps {
 
 export function Header({ onNavigate, currentPage }: HeaderProps) {
   return (
-    <header className="bg-white shadow-sm sticky top-0 z-50">
+    <header className="bg-gray-950/80 backdrop-blur-lg border-b border-white/10 sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           <div className="flex items-center space-x-8">
             <button
               onClick={() => onNavigate('home')}
-              className="flex items-center space-x-2 text-gray-900 hover:text-gray-700 transition-colors"
+              className="flex items-center space-x-2 text-white hover:text-cyan-400 transition-colors group"
             >
-              <Rocket className="w-6 h-6 text-blue-600" />
-              <span className="text-xl font-bold">FundChain</span>
+              <div className="relative">
+                <Rocket className="w-6 h-6 text-cyan-400 group-hover:rotate-12 transition-transform" />
+                <div className="absolute inset-0 blur-lg bg-cyan-400/30 opacity-0 group-hover:opacity-100 transition-opacity" />
+              </div>
+              <span className="text-xl font-bold bg-gradient-to-r from-white to-cyan-200 bg-clip-text text-transparent">
+                FundChain
+              </span>
             </button>
 
-            <nav className="hidden md:flex space-x-6">
+            <nav className="hidden md:flex space-x-1">
               <button
                 onClick={() => onNavigate('home')}
-                className={`text-sm font-medium transition-colors ${
+                className={`px-4 py-2 text-sm font-medium rounded-lg transition-all ${
                   currentPage === 'home'
-                    ? 'text-blue-600'
-                    : 'text-gray-700 hover:text-blue-600'
+                    ? 'bg-cyan-500/20 text-cyan-400 border border-cyan-500/30'
+                    : 'text-gray-400 hover:text-white hover:bg-white/5'
                 }`}
               >
-                Explore
+                Explorar
               </button>
               <button
                 onClick={() => onNavigate('create')}
-                className={`text-sm font-medium transition-colors ${
+                className={`px-4 py-2 text-sm font-medium rounded-lg transition-all ${
                   currentPage === 'create'
-                    ? 'text-blue-600'
-                    : 'text-gray-700 hover:text-blue-600'
+                    ? 'bg-cyan-500/20 text-cyan-400 border border-cyan-500/30'
+                    : 'text-gray-400 hover:text-white hover:bg-white/5'
                 }`}
               >
-                Create Campaign
+                Crear Campaña
               </button>
               <button
                 onClick={() => onNavigate('dashboard')}
-                className={`text-sm font-medium transition-colors ${
+                className={`px-4 py-2 text-sm font-medium rounded-lg transition-all ${
                   currentPage === 'dashboard'
-                    ? 'text-blue-600'
-                    : 'text-gray-700 hover:text-blue-600'
+                    ? 'bg-cyan-500/20 text-cyan-400 border border-cyan-500/30'
+                    : 'text-gray-400 hover:text-white hover:bg-white/5'
                 }`}
               >
-                My Campaigns
+                Mis Campañas
               </button>
             </nav>
           </div>

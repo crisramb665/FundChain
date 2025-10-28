@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Rocket, Shield, Zap, ArrowRight, Search } from 'lucide-react';
+import { Rocket, Shield, Zap, ArrowRight, Search, Sparkles } from 'lucide-react';
 import { supabase, Campaign } from '../lib/supabase';
 import { CampaignCard } from '../components/CampaignCard';
 
@@ -41,118 +41,162 @@ export function LandingPage({ onNavigate }: LandingPageProps) {
   });
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
-      <section className="relative overflow-hidden bg-gradient-to-br from-primary-600 via-primary-700 to-primary-900 text-white">
-        <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZGVmcz48cGF0dGVybiBpZD0iZ3JpZCIgd2lkdGg9IjQwIiBoZWlnaHQ9IjQwIiBwYXR0ZXJuVW5pdHM9InVzZXJTcGFjZU9uVXNlIj48cGF0aCBkPSJNIDQwIDAgTCAwIDAgMCA0MCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJyZ2JhKDI1NSwgMjU1LCAyNTUsIDAuMDUpIiBzdHJva2Utd2lkdGg9IjEiLz48L3BhdHRlcm4+PC9kZWZzPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbGw9InVybCgjZ3JpZCkiLz48L3N2Zz4=')] opacity-20" />
+    <div className="min-h-screen bg-gradient-to-b from-gray-950 via-gray-900 to-black">
+      <section className="relative overflow-hidden">
+        <div className="absolute inset-0 bg-grid-pattern" style={{ backgroundSize: '50px 50px' }} />
 
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
-          <div className="text-center max-w-4xl mx-auto">
-            <h1 className="text-5xl md:text-7xl font-bold mb-6 leading-tight">
-              Recauda rápido.
-              <span className="block text-transparent bg-clip-text bg-gradient-to-r from-accent-400 to-accent-200 mt-2">
-                Transparente. En Scroll L2.
+        <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/10 via-transparent to-purple-500/10" />
+
+        <div className="absolute top-20 left-1/4 w-96 h-96 bg-cyan-500/20 rounded-full filter blur-3xl animate-pulse-slow" />
+        <div className="absolute bottom-20 right-1/4 w-96 h-96 bg-purple-500/20 rounded-full filter blur-3xl animate-pulse-slow" style={{ animationDelay: '1s' }} />
+
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-32">
+          <div className="text-center max-w-5xl mx-auto">
+            <div className="inline-flex items-center space-x-2 px-4 py-2 bg-white/5 backdrop-blur-sm border border-white/10 rounded-full mb-8 animate-float">
+              <Sparkles className="w-4 h-4 text-cyan-400" />
+              <span className="text-sm text-gray-300">Powered by Scroll L2</span>
+            </div>
+
+            <h1 className="text-6xl md:text-8xl font-bold mb-8 leading-tight">
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-white via-cyan-200 to-white">
+                Recauda rápido.
+              </span>
+              <br />
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400 animate-shimmer" style={{
+                backgroundSize: '200% auto',
+              }}>
+                Transparente. On-Chain.
               </span>
             </h1>
-            <p className="text-xl md:text-2xl text-gray-200 mb-10 leading-relaxed max-w-2xl mx-auto">
+
+            <p className="text-xl md:text-2xl text-gray-400 mb-12 leading-relaxed max-w-3xl mx-auto">
               Crea campañas con objetivo y duración. Recibe pledges on-chain con bajas comisiones. Simple y transparente.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+
+            <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
               <button
                 onClick={() => onNavigate('create')}
-                className="flex items-center justify-center space-x-2 px-8 py-4 bg-accent-500 text-white rounded-lg hover:bg-accent-600 transition-all shadow-lg hover:shadow-xl font-semibold text-lg"
+                className="group relative flex items-center justify-center space-x-2 px-8 py-4 bg-gradient-to-r from-cyan-500 to-purple-500 text-white rounded-lg overflow-hidden transition-all hover:scale-105 hover:shadow-2xl hover:shadow-cyan-500/50 font-semibold text-lg"
               >
-                <Rocket className="w-5 h-5" />
-                <span>Crear campaña</span>
-                <ArrowRight className="w-5 h-5" />
+                <div className="absolute inset-0 bg-gradient-to-r from-cyan-400 to-purple-400 opacity-0 group-hover:opacity-100 transition-opacity" />
+                <Rocket className="w-5 h-5 relative z-10" />
+                <span className="relative z-10">Crear campaña</span>
+                <ArrowRight className="w-5 h-5 relative z-10 group-hover:translate-x-1 transition-transform" />
               </button>
+
               <button
                 onClick={() => document.getElementById('campaigns')?.scrollIntoView({ behavior: 'smooth' })}
-                className="px-8 py-4 border-2 border-white text-white rounded-lg hover:bg-white hover:text-primary-600 transition-all font-semibold text-lg"
+                className="flex items-center justify-center space-x-2 px-8 py-4 bg-white/5 backdrop-blur-sm border-2 border-white/10 text-white rounded-lg hover:bg-white/10 hover:border-cyan-400/50 transition-all font-semibold text-lg"
               >
-                Ver campañas
+                <span>Ver campañas</span>
               </button>
             </div>
-            <div className="mt-8 text-sm text-gray-300">
-              <span className="inline-block px-3 py-1 bg-white/10 rounded-full">
-                Alpha en Scroll Testnet
-              </span>
+
+            <div className="flex items-center justify-center gap-6 text-sm text-gray-500">
+              <div className="flex items-center space-x-2">
+                <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
+                <span>Alpha en Scroll Testnet</span>
+              </div>
             </div>
           </div>
         </div>
+
+        <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-cyan-500/50 to-transparent" />
       </section>
 
-      <section className="py-16 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section className="py-24 relative">
+        <div className="absolute inset-0 bg-grid-pattern opacity-20" style={{ backgroundSize: '50px 50px' }} />
+
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid md:grid-cols-3 gap-8">
-            <div className="text-center p-6">
-              <div className="inline-flex items-center justify-center w-16 h-16 bg-accent-100 rounded-full mb-4">
-                <Shield className="w-8 h-8 text-accent-600" />
+            <div className="group relative p-8 bg-gradient-to-br from-white/5 to-white/0 backdrop-blur-sm border border-white/10 rounded-2xl hover:border-cyan-400/50 transition-all hover:scale-105">
+              <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity rounded-2xl" />
+
+              <div className="relative">
+                <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-cyan-400/20 to-cyan-600/20 border border-cyan-400/30 rounded-2xl mb-6 group-hover:animate-float">
+                  <Shield className="w-8 h-8 text-cyan-400" />
+                </div>
+                <h3 className="text-2xl font-bold text-white mb-3">Seguro y Transparente</h3>
+                <p className="text-gray-400 leading-relaxed">
+                  Todas las transacciones on-chain con total transparencia. Tus fondos protegidos por smart contracts.
+                </p>
               </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">Seguro y Transparente</h3>
-              <p className="text-gray-600">
-                Todas las transacciones on-chain con total transparencia. Tus fondos protegidos por smart contracts.
-              </p>
             </div>
 
-            <div className="text-center p-6">
-              <div className="inline-flex items-center justify-center w-16 h-16 bg-accent-100 rounded-full mb-4">
-                <Zap className="w-8 h-8 text-accent-600" />
+            <div className="group relative p-8 bg-gradient-to-br from-white/5 to-white/0 backdrop-blur-sm border border-white/10 rounded-2xl hover:border-purple-400/50 transition-all hover:scale-105">
+              <div className="absolute inset-0 bg-gradient-to-br from-purple-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity rounded-2xl" />
+
+              <div className="relative">
+                <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-purple-400/20 to-purple-600/20 border border-purple-400/30 rounded-2xl mb-6 group-hover:animate-float">
+                  <Zap className="w-8 h-8 text-purple-400" />
+                </div>
+                <h3 className="text-2xl font-bold text-white mb-3">Rápido y Fácil</h3>
+                <p className="text-gray-400 leading-relaxed">
+                  Lanza tu campaña en minutos. Acepta ETH y USDC con comisiones mínimas en Scroll L2.
+                </p>
               </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">Rápido y Fácil</h3>
-              <p className="text-gray-600">
-                Lanza tu campaña en minutos. Acepta ETH y USDC con comisiones mínimas en Scroll L2.
-              </p>
             </div>
 
-            <div className="text-center p-6">
-              <div className="inline-flex items-center justify-center w-16 h-16 bg-accent-100 rounded-full mb-4">
-                <Rocket className="w-8 h-8 text-accent-600" />
+            <div className="group relative p-8 bg-gradient-to-br from-white/5 to-white/0 backdrop-blur-sm border border-white/10 rounded-2xl hover:border-pink-400/50 transition-all hover:scale-105">
+              <div className="absolute inset-0 bg-gradient-to-br from-pink-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity rounded-2xl" />
+
+              <div className="relative">
+                <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-pink-400/20 to-pink-600/20 border border-pink-400/30 rounded-2xl mb-6 group-hover:animate-float">
+                  <Rocket className="w-8 h-8 text-pink-400" />
+                </div>
+                <h3 className="text-2xl font-bold text-white mb-3">Alcance Global</h3>
+                <p className="text-gray-400 leading-relaxed">
+                  Llega a backers en todo el mundo. Sin límites geográficos, sin intermediarios.
+                </p>
               </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">Alcance Global</h3>
-              <p className="text-gray-600">
-                Llega a backers en todo el mundo. Sin límites geográficos, sin intermediarios.
-              </p>
             </div>
           </div>
         </div>
       </section>
 
-      <section id="campaigns" className="py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8">
+      <section id="campaigns" className="py-24 relative">
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-cyan-500/5 to-transparent" />
+
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-12">
             <div>
-              <h2 className="text-3xl font-bold text-gray-900 mb-2">Campañas Activas</h2>
-              <p className="text-gray-600">Descubre proyectos buscando apoyo</p>
+              <h2 className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-white to-gray-400 mb-3">
+                Campañas Activas
+              </h2>
+              <p className="text-gray-400 text-lg">Descubre proyectos buscando apoyo</p>
             </div>
 
-            <div className="mt-4 md:mt-0 flex flex-col sm:flex-row gap-3">
+            <div className="mt-6 md:mt-0 flex flex-col sm:flex-row gap-3">
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-500" />
                 <input
                   type="text"
                   placeholder="Buscar campañas..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent-500 focus:border-transparent"
+                  className="pl-12 pr-4 py-3 bg-white/5 backdrop-blur-sm border border-white/10 rounded-lg focus:ring-2 focus:ring-cyan-400/50 focus:border-cyan-400/50 text-white placeholder-gray-500 transition-all"
                 />
               </div>
 
               <select
                 value={filterType}
                 onChange={(e) => setFilterType(e.target.value as any)}
-                className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent-500 focus:border-transparent"
+                className="px-4 py-3 bg-white/5 backdrop-blur-sm border border-white/10 rounded-lg focus:ring-2 focus:ring-cyan-400/50 focus:border-cyan-400/50 text-white transition-all"
               >
-                <option value="all">Todos</option>
-                <option value="event">Eventos</option>
-                <option value="preorder">Pre-órdenes</option>
-                <option value="donation">Donaciones</option>
+                <option value="all" className="bg-gray-900">Todos</option>
+                <option value="event" className="bg-gray-900">Eventos</option>
+                <option value="preorder" className="bg-gray-900">Pre-órdenes</option>
+                <option value="donation" className="bg-gray-900">Donaciones</option>
               </select>
             </div>
           </div>
 
           {loading ? (
-            <div className="flex items-center justify-center py-20">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-accent-600" />
+            <div className="flex items-center justify-center py-32">
+              <div className="relative">
+                <div className="w-16 h-16 border-4 border-cyan-400/20 border-t-cyan-400 rounded-full animate-spin" />
+                <div className="absolute inset-0 w-16 h-16 border-4 border-transparent border-t-purple-400 rounded-full animate-spin" style={{ animationDirection: 'reverse', animationDuration: '1s' }} />
+              </div>
             </div>
           ) : filteredCampaigns.length > 0 ? (
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -165,8 +209,11 @@ export function LandingPage({ onNavigate }: LandingPageProps) {
               ))}
             </div>
           ) : (
-            <div className="text-center py-20">
-              <p className="text-gray-500 text-lg">No se encontraron campañas que coincidan con tu búsqueda</p>
+            <div className="text-center py-32">
+              <div className="inline-flex items-center justify-center w-20 h-20 bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl mb-6">
+                <Search className="w-10 h-10 text-gray-600" />
+              </div>
+              <p className="text-gray-500 text-xl">No se encontraron campañas que coincidan con tu búsqueda</p>
             </div>
           )}
         </div>
