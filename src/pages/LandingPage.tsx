@@ -13,7 +13,6 @@ export function LandingPage({ onNavigate }: LandingPageProps) {
   const { t } = useTranslation();
   const [campaigns, setCampaigns] = useState<Campaign[]>([]);
   const [loading, setLoading] = useState(true);
-  const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
     loadCampaigns();
@@ -25,10 +24,6 @@ export function LandingPage({ onNavigate }: LandingPageProps) {
     setCampaigns(data.filter(c => c.isActive));
     setLoading(false);
   };
-
-  const filteredCampaigns = campaigns.filter((campaign) => {
-    return campaign.isActive;
-  });
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-950 via-gray-900 to-black">
@@ -156,29 +151,6 @@ export function LandingPage({ onNavigate }: LandingPageProps) {
               <p className="text-gray-400 text-lg">{t('landing.campaigns.subtitle')}</p>
             </div>
 
-            <div className="mt-6 md:mt-0 flex flex-col sm:flex-row gap-3">
-              <div className="relative">
-                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-500" />
-                <input
-                  type="text"
-                  placeholder={t('landing.campaigns.searchPlaceholder')}
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-12 pr-4 py-3 bg-white/5 backdrop-blur-sm border border-white/10 rounded-lg focus:ring-2 focus:ring-cyan-400/50 focus:border-cyan-400/50 text-white placeholder-gray-500 transition-all"
-                />
-              </div>
-
-              <select
-                value={filterType}
-                onChange={(e) => setFilterType(e.target.value as any)}
-                className="px-4 py-3 bg-white/5 backdrop-blur-sm border border-white/10 rounded-lg focus:ring-2 focus:ring-cyan-400/50 focus:border-cyan-400/50 text-white transition-all"
-              >
-                <option value="all" className="bg-gray-900">{t('landing.campaigns.filterAll')}</option>
-                <option value="event" className="bg-gray-900">{t('landing.campaigns.filterEvent')}</option>
-                <option value="preorder" className="bg-gray-900">{t('landing.campaigns.filterPreorder')}</option>
-                <option value="donation" className="bg-gray-900">{t('landing.campaigns.filterDonation')}</option>
-              </select>
-            </div>
           </div>
 
           {loading ? (
@@ -188,9 +160,9 @@ export function LandingPage({ onNavigate }: LandingPageProps) {
                 <div className="absolute inset-0 w-16 h-16 border-4 border-transparent border-t-purple-400 rounded-full animate-spin" style={{ animationDirection: 'reverse', animationDuration: '1s' }} />
               </div>
             </div>
-          ) : filteredCampaigns.length > 0 ? (
+          ) : campaigns.length > 0 ? (
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filteredCampaigns.map((campaign) => (
+              {campaigns.map((campaign) => (
                 <CampaignCard
                   key={campaign.id}
                   campaign={campaign}
