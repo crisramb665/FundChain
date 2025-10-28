@@ -1,7 +1,10 @@
-import { Rocket } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { Rocket, Shield } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { ConnectWallet } from './ConnectWallet';
 import { LanguageSwitcher } from './LanguageSwitcher';
+import { useWeb3 } from '../contexts/Web3Context';
+import { getContractOwner } from '../lib/contract';
 
 interface HeaderProps {
   onNavigate: (page: string) => void;
@@ -10,6 +13,26 @@ interface HeaderProps {
 
 export function Header({ onNavigate, currentPage }: HeaderProps) {
   const { t } = useTranslation();
+  const { account } = useWeb3();
+  const [isContractOwner, setIsContractOwner] = useState(false);
+
+  useEffect(() => {
+    checkIfOwner();
+  }, [account]);
+
+  const checkIfOwner = async () => {
+    if (!account) {
+      setIsContractOwner(false);
+      return;
+    }
+
+    const owner = await getContractOwner();
+    if (owner && account.toLowerCase() === owner.toLowerCase()) {
+      setIsContractOwner(true);
+    } else {
+      setIsContractOwner(false);
+    }
+  };
 
   return (
     <header className="bg-gray-950/80 backdrop-blur-lg border-b border-white/10 sticky top-0 z-50">
@@ -60,6 +83,19 @@ export function Header({ onNavigate, currentPage }: HeaderProps) {
               >
                 {t('header.myCampaigns')}
               </button>
+              {isContractOwner && (
+                <button
+                  onClick={() => onNavigate('admin')}
+                  className={`px-4 py-2 text-sm font-medium rounded-lg transition-all flex items-center space-x-1 ${
+                    currentPage === 'admin'
+                      ? 'bg-purple-500/20 text-purple-400 border border-purple-500/30'
+                      : 'text-gray-400 hover:text-white hover:bg-white/5'
+                  }`}
+                >
+                  <Shield className="w-4 h-4" />
+                  <span>Admin</span>
+                </button>
+              )}
             </nav>
           </div>
 

@@ -272,6 +272,17 @@ export async function checkModerationRequired(): Promise<boolean> {
   }
 }
 
+export async function getContractOwner(): Promise<string | null> {
+  try {
+    const contract = getContract();
+    const owner = await contract.owner();
+    return owner;
+  } catch (error) {
+    console.error('Error getting contract owner:', error);
+    return null;
+  }
+}
+
 export interface Campaign {
   id: number;
   owner: string;
