@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Save, Eye, Calendar, DollarSign, Image as ImageIcon, FileText } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useWeb3 } from '../contexts/Web3Context';
+import { useContract } from '../hooks/useContract';
 import { supabase } from '../lib/supabase';
 import { parseEther, getEthPrice, getUsdcPrice, calculateFiatEquivalent } from '../lib/web3';
 
@@ -11,7 +12,8 @@ interface CreateCampaignPageProps {
 
 export function CreateCampaignPage({ onNavigate }: CreateCampaignPageProps) {
   const { user } = useAuth();
-  const { account, connectWallet } = useWeb3();
+  const { account, connectWallet, isCorrectNetwork } = useWeb3();
+  const { createCampaign, loading: contractLoading, error: contractError } = useContract();
   const [loading, setLoading] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
 
@@ -65,8 +67,30 @@ export function CreateCampaignPage({ onNavigate }: CreateCampaignPageProps) {
       return;
     }
 
+    if (!isCorrectNetwork) {
+      alert('Please switch to Scroll Sepolia network to create a campaign');
+      return;
+    }
+
     setLoading(true);
     try {
+      const deadline = new Date(formData.deadline);
+      const now = new Date();
+      const durationDays = Math.ceil((deadline.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+
+      const contractResult = await createCampaign(
+        formData.goalAmount,
+        durationDays,
+        '',
+        '0'
+      );
+
+      if (!contractResult) {
+        alert(contractError || 'Failed to create campaign on blockchain. Please try again.');
+        setLoading(false);
+        return;
+      }
+
       const decimals = formData.token === 'ETH' ? 18 : 6;
       const goalAmountWei = parseEther(formData.goalAmount);
 
@@ -91,11 +115,13 @@ export function CreateCampaignPage({ onNavigate }: CreateCampaignPageProps) {
           description: formData.description,
           goal_amount: goalAmountWei,
           token: formData.token,
-          deadline: new Date(formData.deadline).toISOString(),
+          deadline: deadline.toISOString(),
           campaign_type: formData.campaignType,
           image_url: formData.imageUrl || null,
           status: 'pending',
           moderation_status: 'pending',
+          contract_id: contractResult.campaignId,
+          contract_address: account,
         })
         .select()
         .single();
@@ -106,10 +132,14 @@ export function CreateCampaignPage({ onNavigate }: CreateCampaignPageProps) {
         campaign_id: campaign.id,
         user_id: user.id,
         event_type: 'created',
-        data: { title: formData.title },
+        data: {
+          title: formData.title,
+          txHash: contractResult.txHash,
+          contractId: contractResult.campaignId,
+        },
       });
 
-      alert('Campaign created successfully! It will be reviewed by our team.');
+      alert(`Campaign created successfully on-chain! Transaction: ${contractResult.txHash}\nYour campaign will be reviewed by our team.`);
       onNavigate('dashboard');
     } catch (error) {
       console.error('Error creating campaign:', error);
@@ -318,11 +348,11 @@ export function CreateCampaignPage({ onNavigate }: CreateCampaignPageProps) {
 
               <button
                 type="submit"
-                disabled={!isFormValid() || loading}
+                disabled={!isFormValid() || loading || contractLoading}
                 className="flex-1 flex items-center justify-center space-x-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <Save className="w-5 h-5" />
-                <span>{loading ? 'Creating...' : 'Create Campaign'}</span>
+                <span>{(loading || contractLoading) ? 'Creating...' : 'Create Campaign'}</span>
               </button>
             </div>
           </form>
