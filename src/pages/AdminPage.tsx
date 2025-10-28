@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import { Shield, CheckCircle, XCircle, Eye, Clock, AlertCircle } from 'lucide-react';
-import { fetchAllCampaigns, approveCampaignOnChain, checkModerationRequired, Campaign } from '../lib/contract';
+import { Shield, CheckCircle, XCircle, Eye, Clock, AlertCircle, Lock } from 'lucide-react';
+import { fetchAllCampaigns, approveCampaignOnChain, checkModerationRequired, getContractOwner, Campaign } from '../lib/contract';
 import { useWeb3 } from '../contexts/Web3Context';
 import { ethers } from 'ethers';
 import { CONTRACT_ADDRESS } from '../lib/scroll-config';
@@ -16,6 +16,7 @@ export function AdminPage({ onNavigate }: AdminPageProps) {
   const [moderationRequired, setModerationRequired] = useState(false);
   const [processing, setProcessing] = useState<number | null>(null);
   const [isContractOwner, setIsContractOwner] = useState(false);
+  const [checkingOwner, setCheckingOwner] = useState(true);
 
   useEffect(() => {
     loadCampaigns();
@@ -23,12 +24,23 @@ export function AdminPage({ onNavigate }: AdminPageProps) {
   }, [account]);
 
   const checkIfOwner = async () => {
-    if (!account) return;
+    setCheckingOwner(true);
+    if (!account) {
+      setIsContractOwner(false);
+      setCheckingOwner(false);
+      return;
+    }
 
     const modRequired = await checkModerationRequired();
     setModerationRequired(modRequired);
 
-    setIsContractOwner(true);
+    const owner = await getContractOwner();
+    if (owner && account.toLowerCase() === owner.toLowerCase()) {
+      setIsContractOwner(true);
+    } else {
+      setIsContractOwner(false);
+    }
+    setCheckingOwner(false);
   };
 
   const loadCampaigns = async () => {
@@ -68,18 +80,51 @@ export function AdminPage({ onNavigate }: AdminPageProps) {
     }
   };
 
+  if (checkingOwner) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-gray-950 via-gray-900 to-black flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-cyan-400" />
+      </div>
+    );
+  }
+
   if (!account) {
     return (
       <div className="min-h-screen bg-gradient-to-b from-gray-950 via-gray-900 to-black flex items-center justify-center">
         <div className="text-center">
           <Shield className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-          <h2 className="text-2xl font-bold text-white mb-4">Admin Access Required</h2>
-          <p className="text-gray-400 mb-6">Connect your wallet to access the admin panel</p>
+          <h2 className="text-2xl font-bold text-white mb-4">Admin Panel</h2>
+          <p className="text-gray-400 mb-6">Connect your wallet to check admin access</p>
           <button
             onClick={connectWallet}
             className="px-6 py-3 bg-gradient-to-r from-cyan-500 to-purple-500 text-white rounded-lg hover:scale-105 transition-all"
           >
             Connect Wallet
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  if (!isContractOwner) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-gray-950 via-gray-900 to-black flex items-center justify-center">
+        <div className="text-center max-w-md">
+          <Lock className="w-16 h-16 text-red-400 mx-auto mb-4" />
+          <h2 className="text-2xl font-bold text-white mb-4">Access Denied</h2>
+          <p className="text-gray-400 mb-2">You are not the contract owner.</p>
+          <p className="text-sm text-gray-500 mb-6">
+            Only the contract owner can access the admin panel to approve campaigns.
+          </p>
+          <div className="p-4 bg-white/5 border border-white/10 rounded-lg">
+            <p className="text-xs text-gray-400 mb-1">Your Address:</p>
+            <code className="text-xs text-cyan-400">{account}</code>
+          </div>
+          <button
+            onClick={() => onNavigate('home')}
+            className="mt-6 px-6 py-3 bg-white/10 text-white rounded-lg hover:bg-white/20 transition-all"
+          >
+            Back to Home
           </button>
         </div>
       </div>

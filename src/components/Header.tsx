@@ -83,19 +83,17 @@ export function Header({ onNavigate, currentPage }: HeaderProps) {
               >
                 {t('header.myCampaigns')}
               </button>
-              {isContractOwner && (
-                <button
-                  onClick={() => onNavigate('admin')}
-                  className={`px-4 py-2 text-sm font-medium rounded-lg transition-all flex items-center space-x-1 ${
-                    currentPage === 'admin'
-                      ? 'bg-purple-500/20 text-purple-400 border border-purple-500/30'
-                      : 'text-gray-400 hover:text-white hover:bg-white/5'
-                  }`}
-                >
-                  <Shield className="w-4 h-4" />
-                  <span>Admin</span>
-                </button>
-              )}
+              <button
+                onClick={() => onNavigate('admin')}
+                className={`px-4 py-2 text-sm font-medium rounded-lg transition-all flex items-center space-x-1 ${
+                  currentPage === 'admin'
+                    ? 'bg-purple-500/20 text-purple-400 border border-purple-500/30'
+                    : 'text-gray-400 hover:text-white hover:bg-white/5'
+                }`}
+              >
+                <Shield className="w-4 h-4" />
+                <span>Admin</span>
+              </button>
             </nav>
           </div>
 
