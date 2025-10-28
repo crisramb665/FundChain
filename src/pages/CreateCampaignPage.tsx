@@ -1,9 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Save, Eye, Calendar, DollarSign, Image as ImageIcon, FileText } from 'lucide-react';
-import { useAuth } from '../contexts/AuthContext';
 import { useWeb3 } from '../contexts/Web3Context';
 import { useContract } from '../hooks/useContract';
-import { supabase } from '../lib/supabase';
 import { parseEther, getEthPrice, getUsdcPrice, calculateFiatEquivalent } from '../lib/web3';
 
 interface CreateCampaignPageProps {
@@ -11,7 +9,6 @@ interface CreateCampaignPageProps {
 }
 
 export function CreateCampaignPage({ onNavigate }: CreateCampaignPageProps) {
-  const { user } = useAuth();
   const { account, connectWallet, isCorrectNetwork } = useWeb3();
   const { createCampaign, loading: contractLoading, error: contractError } = useContract();
   const [loading, setLoading] = useState(false);
@@ -62,12 +59,7 @@ export function CreateCampaignPage({ onNavigate }: CreateCampaignPageProps) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    console.log('Form submitted', { user, account, isCorrectNetwork });
-
-    if (!user) {
-      alert('Please sign in first to create a campaign');
-      return;
-    }
+    console.log('Form submitted', { account, isCorrectNetwork });
 
     if (!account) {
       console.log('No wallet connected, connecting...');
@@ -111,56 +103,8 @@ export function CreateCampaignPage({ onNavigate }: CreateCampaignPageProps) {
 
       console.log('Campaign created on-chain successfully:', contractResult);
 
-      const decimals = formData.token === 'ETH' ? 18 : 6;
-      const goalAmountWei = parseEther(formData.goalAmount);
-
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', user.id)
-        .maybeSingle();
-
-      if (!profile) {
-        await supabase.from('profiles').insert({
-          id: user.id,
-          wallet_address: account,
-        });
-      }
-
-      const { data: campaign, error } = await supabase
-        .from('campaigns')
-        .insert({
-          organizer_id: user.id,
-          title: formData.title,
-          description: formData.description,
-          goal_amount: goalAmountWei,
-          token: formData.token,
-          deadline: deadline.toISOString(),
-          campaign_type: formData.campaignType,
-          image_url: formData.imageUrl || null,
-          status: 'pending',
-          moderation_status: 'pending',
-          contract_id: contractResult.campaignId,
-          contract_address: account,
-        })
-        .select()
-        .single();
-
-      if (error) throw error;
-
-      await supabase.from('activity_log').insert({
-        campaign_id: campaign.id,
-        user_id: user.id,
-        event_type: 'created',
-        data: {
-          title: formData.title,
-          txHash: contractResult.txHash,
-          contractId: contractResult.campaignId,
-        },
-      });
-
-      alert(`Campaign created successfully on-chain! Transaction: ${contractResult.txHash}\nYour campaign will be reviewed by our team.`);
-      onNavigate('dashboard');
+      alert(`Campaign created successfully!\n\nTransaction: ${contractResult.txHash}\nCampaign ID: ${contractResult.campaignId}\n\nView on explorer: https://sepolia.scrollscan.com/tx/${contractResult.txHash}`);
+      onNavigate('home');
     } catch (error) {
       console.error('Error creating campaign:', error);
       alert('Failed to create campaign. Please try again.');

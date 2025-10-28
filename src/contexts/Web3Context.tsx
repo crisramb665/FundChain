@@ -1,7 +1,5 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
-import { supabase } from '../lib/supabase';
-import { useAuth } from './AuthContext';
-import { SCROLL_TESTNET, switchToScroll, isScrollNetwork } from '../lib/scroll-config';
+import { switchToScroll, isScrollNetwork } from '../lib/scroll-config';
 
 interface Web3ContextType {
   account: string | null;
@@ -27,7 +25,6 @@ export function Web3Provider({ children }: { children: ReactNode }) {
   const [chainId, setChainId] = useState<number | null>(null);
   const [connecting, setConnecting] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const { user, refreshProfile } = useAuth();
 
   const isCorrectNetwork = chainId ? isScrollNetwork(chainId) : false;
 
@@ -84,32 +81,9 @@ export function Web3Provider({ children }: { children: ReactNode }) {
     }
   };
 
-  const updateProfileWallet = async (walletAddress: string) => {
-    if (!user) return;
-
-    const { data: existingProfile } = await supabase
-      .from('profiles')
-      .select('*')
-      .eq('id', user.id)
-      .maybeSingle();
-
-    if (existingProfile) {
-      await supabase
-        .from('profiles')
-        .update({ wallet_address: walletAddress })
-        .eq('id', user.id);
-    } else {
-      await supabase
-        .from('profiles')
-        .insert({ id: user.id, wallet_address: walletAddress });
-    }
-
-    await refreshProfile();
-  };
-
   const connectWallet = async () => {
     if (!window.ethereum) {
-      setError('Por favor instala MetaMask u otra wallet Web3 para continuar');
+      setError('Please install MetaMask or another Web3 wallet');
       return;
     }
 
@@ -120,7 +94,7 @@ export function Web3Provider({ children }: { children: ReactNode }) {
       const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
 
       if (accounts.length === 0) {
-        throw new Error('No se seleccionó ninguna cuenta');
+        throw new Error('No account selected');
       }
 
       setAccount(accounts[0]);
@@ -130,71 +104,15 @@ export function Web3Provider({ children }: { children: ReactNode }) {
       setChainId(currentChainId);
 
       if (!isScrollNetwork(currentChainId)) {
-        setError('Red incorrecta. Cambiando a Scroll Testnet...');
+        setError('Wrong network. Switching to Scroll Testnet...');
         const switched = await switchToScroll();
         if (switched) {
           setError(null);
           const newChain = await window.ethereum.request({ method: 'eth_chainId' });
           setChainId(parseInt(newChain, 16));
         } else {
-          setError('No se pudo cambiar a Scroll Testnet. Por favor, cámbiala manualmente.');
+          setError('Could not switch to Scroll Testnet. Please switch manually.');
         }
-      }
-
-      if (!user) {
-        console.log('No user session found, creating one...');
-        const email = `${accounts[0].toLowerCase()}@wallet.local`;
-        const password = accounts[0].toLowerCase();
-
-        let authData;
-        const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
-          email,
-          password,
-        });
-
-        if (signInError) {
-          console.log('User does not exist, creating new account...');
-          const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
-            email,
-            password,
-            options: {
-              data: {
-                wallet_address: accounts[0],
-              },
-            },
-          });
-
-          if (signUpError) {
-            console.error('Error creating user:', signUpError);
-            setError('Failed to create user session');
-            return;
-          }
-          authData = signUpData;
-        } else {
-          authData = signInData;
-        }
-
-        if (authData.user) {
-          const { data: existingProfile } = await supabase
-            .from('profiles')
-            .select('*')
-            .eq('id', authData.user.id)
-            .maybeSingle();
-
-          if (!existingProfile) {
-            await supabase.from('profiles').insert({
-              id: authData.user.id,
-              wallet_address: accounts[0],
-            });
-          } else {
-            await supabase
-              .from('profiles')
-              .update({ wallet_address: accounts[0] })
-              .eq('id', authData.user.id);
-          }
-        }
-      } else {
-        await updateProfileWallet(accounts[0]);
       }
     } catch (err: any) {
       console.error('Error connecting wallet:', err);

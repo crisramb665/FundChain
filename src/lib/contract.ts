@@ -239,3 +239,66 @@ export async function cancelCampaignOnChain(
     };
   }
 }
+
+export interface Campaign {
+  id: number;
+  owner: string;
+  token: string;
+  goal: bigint;
+  pledged: bigint;
+  startAt: bigint;
+  endAt: bigint;
+  claimed: boolean;
+  approved: boolean;
+  maxPledge: bigint;
+  progressPercentage: number;
+  daysLeft: number;
+  isActive: boolean;
+}
+
+export async function fetchAllCampaigns(): Promise<Campaign[]> {
+  try {
+    const contract = getContract();
+    const count = await contract.getCampaignsCount();
+    const totalCount = Number(count);
+
+    const campaigns: Campaign[] = [];
+
+    for (let i = 0; i < totalCount; i++) {
+      try {
+        const data = await contract.getCampaign(i);
+        const now = Math.floor(Date.now() / 1000);
+        const endTime = Number(data[5]);
+        const daysLeft = Math.max(0, Math.ceil((endTime - now) / (24 * 60 * 60)));
+        const isActive = now < endTime && !data[6];
+
+        const goal = data[2];
+        const pledged = data[3];
+        const progressPercentage = goal > 0n ? Number((pledged * 100n) / goal) : 0;
+
+        campaigns.push({
+          id: i,
+          owner: data[0],
+          token: data[1],
+          goal,
+          pledged,
+          startAt: data[4],
+          endAt: data[5],
+          claimed: data[6],
+          approved: data[7],
+          maxPledge: data[8],
+          progressPercentage,
+          daysLeft,
+          isActive,
+        });
+      } catch (error) {
+        console.error(`Error fetching campaign ${i}:`, error);
+      }
+    }
+
+    return campaigns;
+  } catch (error) {
+    console.error('Error fetching all campaigns:', error);
+    return [];
+  }
+}

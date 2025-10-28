@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
 import { Rocket, Shield, Zap, ArrowRight, Search, Sparkles } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { supabase, Campaign } from '../lib/supabase';
+import { fetchAllCampaigns, Campaign } from '../lib/contract';
 import { CampaignCard } from '../components/CampaignCard';
+import { ethers } from 'ethers';
 
 interface LandingPageProps {
   onNavigate: (page: string, data?: any) => void;
@@ -13,7 +14,6 @@ export function LandingPage({ onNavigate }: LandingPageProps) {
   const [campaigns, setCampaigns] = useState<Campaign[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
-  const [filterType, setFilterType] = useState<'all' | 'event' | 'preorder' | 'donation'>('all');
 
   useEffect(() => {
     loadCampaigns();
@@ -21,25 +21,13 @@ export function LandingPage({ onNavigate }: LandingPageProps) {
 
   const loadCampaigns = async () => {
     setLoading(true);
-    const { data, error } = await supabase
-      .from('campaigns')
-      .select('*, profiles(*)')
-      .eq('moderation_status', 'approved')
-      .eq('status', 'active')
-      .order('created_at', { ascending: false })
-      .limit(12);
-
-    if (!error && data) {
-      setCampaigns(data);
-    }
+    const data = await fetchAllCampaigns();
+    setCampaigns(data.filter(c => c.isActive));
     setLoading(false);
   };
 
   const filteredCampaigns = campaigns.filter((campaign) => {
-    const matchesSearch = campaign.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         campaign.description.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesType = filterType === 'all' || campaign.campaign_type === filterType;
-    return matchesSearch && matchesType;
+    return campaign.isActive;
   });
 
   return (
