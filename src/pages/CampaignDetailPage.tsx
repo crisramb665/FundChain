@@ -271,7 +271,17 @@ export function CampaignDetailPage({ campaignId, onNavigate }: CampaignDetailPag
                 </div>
               </div>
 
-              {campaign.isActive && (
+              {campaign.isActive && !campaign.approved && (
+                <div className="p-4 bg-yellow-500/10 border border-yellow-500/30 rounded-lg text-center">
+                  <AlertCircle className="w-8 h-8 text-yellow-400 mx-auto mb-2" />
+                  <p className="text-sm text-yellow-300 font-medium mb-1">Campaign Pending Approval</p>
+                  <p className="text-xs text-yellow-400">
+                    This campaign is awaiting approval from the contract owner before accepting pledges
+                  </p>
+                </div>
+              )}
+
+              {campaign.isActive && campaign.approved && (
                 <div className="space-y-3">
                   <input
                     type="number"

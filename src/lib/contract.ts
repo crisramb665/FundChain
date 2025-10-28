@@ -240,6 +240,38 @@ export async function cancelCampaignOnChain(
   }
 }
 
+export async function approveCampaignOnChain(
+  campaignId: number
+): Promise<{ success: boolean; txHash?: string; error?: string }> {
+  try {
+    const contract = await getContractWithSigner();
+    const tx = await contract.approveCampaign(campaignId);
+    const receipt = await tx.wait();
+
+    return {
+      success: true,
+      txHash: receipt.hash,
+    };
+  } catch (error: any) {
+    console.error('Error approving campaign:', error);
+    return {
+      success: false,
+      error: error.message || 'Failed to approve campaign',
+    };
+  }
+}
+
+export async function checkModerationRequired(): Promise<boolean> {
+  try {
+    const contract = getContract();
+    const required = await contract.moderationRequired();
+    return required;
+  } catch (error) {
+    console.error('Error checking moderation:', error);
+    return false;
+  }
+}
+
 export interface Campaign {
   id: number;
   owner: string;
