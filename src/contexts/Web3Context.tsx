@@ -1,13 +1,17 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from './AuthContext';
+import { SCROLL_TESTNET, switchToScroll, isScrollNetwork } from '../lib/scroll-config';
 
 interface Web3ContextType {
   account: string | null;
   chainId: number | null;
   connecting: boolean;
+  error: string | null;
+  isCorrectNetwork: boolean;
   connectWallet: () => Promise<void>;
   disconnectWallet: () => void;
+  switchNetwork: () => Promise<void>;
 }
 
 const Web3Context = createContext<Web3ContextType | undefined>(undefined);
@@ -22,7 +26,10 @@ export function Web3Provider({ children }: { children: ReactNode }) {
   const [account, setAccount] = useState<string | null>(null);
   const [chainId, setChainId] = useState<number | null>(null);
   const [connecting, setConnecting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const { user, refreshProfile } = useAuth();
+
+  const isCorrectNetwork = chainId ? isScrollNetwork(chainId) : false;
 
   useEffect(() => {
     if (window.ethereum) {
@@ -59,13 +66,22 @@ export function Web3Provider({ children }: { children: ReactNode }) {
     if (accounts.length > 0) {
       setAccount(accounts[0]);
       updateProfileWallet(accounts[0]);
+      setError(null);
     } else {
       setAccount(null);
+      setError('Cuenta desconectada');
     }
   };
 
   const handleChainChanged = (chainIdHex: string) => {
-    setChainId(parseInt(chainIdHex, 16));
+    const newChainId = parseInt(chainIdHex, 16);
+    setChainId(newChainId);
+
+    if (!isScrollNetwork(newChainId)) {
+      setError(`Por favor, cambia a Scroll Testnet para usar la aplicación`);
+    } else {
+      setError(null);
+    }
   };
 
   const updateProfileWallet = async (walletAddress: string) => {
@@ -93,31 +109,71 @@ export function Web3Provider({ children }: { children: ReactNode }) {
 
   const connectWallet = async () => {
     if (!window.ethereum) {
-      alert('Please install MetaMask or another Web3 wallet to continue');
+      setError('Por favor instala MetaMask u otra wallet Web3 para continuar');
       return;
     }
 
     setConnecting(true);
+    setError(null);
+
     try {
       const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+
+      if (accounts.length === 0) {
+        throw new Error('No se seleccionó ninguna cuenta');
+      }
+
       setAccount(accounts[0]);
 
       const chain = await window.ethereum.request({ method: 'eth_chainId' });
-      setChainId(parseInt(chain, 16));
+      const currentChainId = parseInt(chain, 16);
+      setChainId(currentChainId);
+
+      if (!isScrollNetwork(currentChainId)) {
+        setError('Red incorrecta. Cambiando a Scroll Testnet...');
+        const switched = await switchToScroll();
+        if (switched) {
+          setError(null);
+          const newChain = await window.ethereum.request({ method: 'eth_chainId' });
+          setChainId(parseInt(newChain, 16));
+        } else {
+          setError('No se pudo cambiar a Scroll Testnet. Por favor, cámbiala manualmente.');
+        }
+      }
 
       if (user) {
         await updateProfileWallet(accounts[0]);
       }
-    } catch (error) {
-      console.error('Error connecting wallet:', error);
+    } catch (err: any) {
+      console.error('Error connecting wallet:', err);
+      if (err.code === 4001) {
+        setError('Conexión rechazada por el usuario');
+      } else if (err.code === -32002) {
+        setError('Ya hay una solicitud de conexión pendiente. Por favor, revisa tu wallet.');
+      } else {
+        setError('Error al conectar wallet. Por favor, intenta de nuevo.');
+      }
     } finally {
       setConnecting(false);
+    }
+  };
+
+  const switchNetwork = async () => {
+    setError(null);
+    try {
+      const success = await switchToScroll();
+      if (!success) {
+        setError('No se pudo cambiar de red. Por favor, cámbiala manualmente en tu wallet.');
+      }
+    } catch (err) {
+      setError('Error al cambiar de red');
     }
   };
 
   const disconnectWallet = () => {
     setAccount(null);
     setChainId(null);
+    setError(null);
   };
 
   return (
@@ -126,8 +182,11 @@ export function Web3Provider({ children }: { children: ReactNode }) {
         account,
         chainId,
         connecting,
+        error,
+        isCorrectNetwork,
         connectWallet,
         disconnectWallet,
+        switchNetwork,
       }}
     >
       {children}
