@@ -141,7 +141,17 @@ export function Web3Provider({ children }: { children: ReactNode }) {
         }
       }
 
-      if (user) {
+      if (!user) {
+        const { data: authData, error: authError } = await supabase.auth.signInAnonymously();
+        if (authError) {
+          console.error('Error signing in anonymously:', authError);
+        } else if (authData.user) {
+          await supabase.from('profiles').insert({
+            id: authData.user.id,
+            wallet_address: accounts[0],
+          });
+        }
+      } else {
         await updateProfileWallet(accounts[0]);
       }
     } catch (err: any) {

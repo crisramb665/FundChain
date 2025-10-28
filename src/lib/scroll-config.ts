@@ -2,7 +2,7 @@ export const SCROLL_TESTNET = {
   chainId: 534351,
   chainIdHex: '0x8274f',
   name: 'Scroll Sepolia Testnet',
-  rpcUrl: 'https://sepolia-rpc.scroll.io',
+  rpcUrl: 'https://scroll-sepolia.drpc.org',
   blockExplorer: 'https://sepolia.scrollscan.com',
   nativeCurrency: {
     name: 'Ether',

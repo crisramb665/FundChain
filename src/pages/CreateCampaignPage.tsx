@@ -62,7 +62,15 @@ export function CreateCampaignPage({ onNavigate }: CreateCampaignPageProps) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!user || !account) {
+    console.log('Form submitted', { user, account, isCorrectNetwork });
+
+    if (!user) {
+      alert('Please sign in first to create a campaign');
+      return;
+    }
+
+    if (!account) {
+      console.log('No wallet connected, connecting...');
       await connectWallet();
       return;
     }
@@ -72,11 +80,17 @@ export function CreateCampaignPage({ onNavigate }: CreateCampaignPageProps) {
       return;
     }
 
+    console.log('Starting campaign creation...');
     setLoading(true);
     try {
       const deadline = new Date(formData.deadline);
       const now = new Date();
       const durationDays = Math.ceil((deadline.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+
+      console.log('Creating campaign on-chain...', {
+        goalAmount: formData.goalAmount,
+        durationDays,
+      });
 
       const contractResult = await createCampaign(
         formData.goalAmount,
@@ -85,11 +99,17 @@ export function CreateCampaignPage({ onNavigate }: CreateCampaignPageProps) {
         '0'
       );
 
+      console.log('Contract result:', contractResult);
+
       if (!contractResult) {
-        alert(contractError || 'Failed to create campaign on blockchain. Please try again.');
+        const errorMsg = contractError || 'Failed to create campaign on blockchain. Please try again.';
+        console.error('Contract creation failed:', errorMsg);
+        alert(errorMsg);
         setLoading(false);
         return;
       }
+
+      console.log('Campaign created on-chain successfully:', contractResult);
 
       const decimals = formData.token === 'ETH' ? 18 : 6;
       const goalAmountWei = parseEther(formData.goalAmount);
