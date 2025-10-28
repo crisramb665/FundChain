@@ -1,0 +1,184 @@
+{
+  "common": {
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "close": "Close",
+    "save": "Save",
+    "edit": "Edit",
+    "delete": "Delete",
+    "search": "Search",
+    "filter": "Filter",
+    "all": "All"
+  },
+  "header": {
+    "explore": "Explore",
+    "createCampaign": "Create Campaign",
+    "myCampaigns": "My Campaigns",
+    "admin": "Admin"
+  },
+  "wallet": {
+    "connect": "Connect Wallet",
+    "connecting": "Connecting...",
+    "disconnect": "Disconnect",
+    "connected": "Connected",
+    "wallet": "Wallet",
+    "network": "Network",
+    "wrongNetwork": "Wrong network",
+    "switchNetwork": "Switch Network",
+    "switchToScroll": "Switch to Scroll Testnet",
+    "installWallet": "Please install MetaMask or another Web3 wallet to continue",
+    "connectionRejected": "Connection rejected by user",
+    "pendingRequest": "There's already a pending connection request. Please check your wallet.",
+    "connectionError": "Error connecting wallet. Please try again.",
+    "accountDisconnected": "Account disconnected",
+    "networkError": "Please switch to Scroll Testnet to use the app"
+  },
+  "landing": {
+    "hero": {
+      "poweredBy": "Powered by Scroll L2",
+      "title1": "Fund Fast.",
+      "title2": "Transparent. On-Chain.",
+      "subtitle": "Create campaigns with goals and deadlines. Receive on-chain pledges with low fees. Simple and transparent.",
+      "createButton": "Create campaign",
+      "exploreButton": "View campaigns",
+      "alphaStatus": "Alpha on Scroll Testnet"
+    },
+    "features": {
+      "secure": {
+        "title": "Secure & Transparent",
+        "description": "All transactions on-chain with full transparency. Your funds protected by smart contracts."
+      },
+      "fast": {
+        "title": "Fast & Easy",
+        "description": "Launch your campaign in minutes. Accept ETH and USDC with minimal fees on Scroll L2."
+      },
+      "global": {
+        "title": "Global Reach",
+        "description": "Reach backers worldwide. No geographic limits, no intermediaries."
+      }
+    },
+    "campaigns": {
+      "title": "Active Campaigns",
+      "subtitle": "Discover projects seeking support",
+      "searchPlaceholder": "Search campaigns...",
+      "filterAll": "All",
+      "filterEvent": "Events",
+      "filterPreorder": "Pre-orders",
+      "filterDonation": "Donations",
+      "noCampaigns": "No campaigns found matching your search"
+    }
+  },
+  "campaign": {
+    "status": {
+      "active": "Active",
+      "successful": "Successful",
+      "failed": "Failed",
+      "pending": "Pending",
+      "cancelled": "Cancelled"
+    },
+    "type": {
+      "event": "Event",
+      "preorder": "Pre-order",
+      "donation": "Donation"
+    },
+    "backers": "backers",
+    "daysLeft": "days left",
+    "goal": "Goal",
+    "raised": "raised",
+    "backThisCampaign": "Back This Campaign",
+    "withdraw": "Withdraw Funds",
+    "claimRefund": "Claim Refund",
+    "exportPledges": "Export Pledges",
+    "viewOnExplorer": "View on Etherscan",
+    "share": "Share",
+    "activity": "Activity",
+    "noActivity": "No activity yet",
+    "notFound": "Campaign Not Found",
+    "returnHome": "Return to Home"
+  },
+  "createCampaign": {
+    "title": "Create Campaign",
+    "subtitle": "Launch your crowdfunding campaign and start accepting pledges",
+    "form": {
+      "title": "Campaign Title",
+      "titlePlaceholder": "Enter a clear, descriptive title",
+      "description": "Description",
+      "descriptionPlaceholder": "Tell backers about your project. What are you building? Why does it matter?",
+      "goalAmount": "Goal Amount",
+      "goalPlaceholder": "0.00",
+      "token": "Token",
+      "deadline": "Deadline",
+      "campaignType": "Campaign Type",
+      "imageUrl": "Image URL (Optional)",
+      "imageUrlPlaceholder": "https://example.com/image.jpg"
+    },
+    "preview": "Preview",
+    "backToEdit": "Back to Edit",
+    "create": "Create Campaign",
+    "creating": "Creating...",
+    "success": "Campaign created — share your link to start receiving pledges.",
+    "error": "Failed to create campaign. Please try again."
+  },
+  "dashboard": {
+    "title": "My Campaigns",
+    "subtitle": "Manage and track your crowdfunding campaigns",
+    "createCampaign": "Create Campaign",
+    "stats": {
+      "total": "Total Campaigns",
+      "active": "Active",
+      "successful": "Successful",
+      "pending": "Under Review"
+    },
+    "filter": {
+      "all": "All",
+      "pending": "Pending",
+      "active": "Active",
+      "successful": "Successful",
+      "failed": "Failed"
+    },
+    "noCampaigns": "No Campaigns Yet",
+    "noCampaignsSubtitle": "Start by creating your first campaign",
+    "noCampaignsFiltered": "No {{status}} campaigns found",
+    "createFirstCampaign": "Create Your First Campaign",
+    "connectWallet": "Connect Your Wallet",
+    "connectWalletSubtitle": "Please connect your wallet to view your dashboard"
+  },
+  "admin": {
+    "title": "Moderation Panel",
+    "subtitle": "Review and approve campaigns before they go live",
+    "pending": "Pending Review",
+    "pendingCampaigns": "Pending Campaigns",
+    "reviewCampaign": "Review Campaign",
+    "selectCampaign": "Select a campaign to review",
+    "moderationNotes": "Moderation Notes (Optional)",
+    "moderationNotesPlaceholder": "Add any notes about your decision...",
+    "approve": "Approve",
+    "reject": "Reject",
+    "processing": "Processing...",
+    "allCaughtUp": "All Caught Up!",
+    "noPendingCampaigns": "No campaigns pending review at the moment",
+    "approveConfirm": "Are you sure you want to approve this campaign?",
+    "rejectConfirm": "Are you sure you want to reject this campaign?",
+    "approveSuccess": "Campaign approved successfully",
+    "rejectSuccess": "Campaign rejected successfully"
+  },
+  "pledge": {
+    "title": "Back This Campaign",
+    "amount": "Pledge Amount",
+    "amountPlaceholder": "0.00",
+    "quickSelect": "Quick Select",
+    "note": "Note:",
+    "demoNote": "This is a demo. In production, this would trigger a real Web3 transaction to the smart contract.",
+    "confirm": "Confirm Pledge",
+    "processing": "Processing...",
+    "success": "Transaction Submitted!",
+    "successMessage": "Your pledge is being processed",
+    "txHash": "Transaction Hash",
+    "viewOnExplorer": "View on Explorer",
+    "invalidAmount": "Please enter a valid amount",
+    "error": "Failed to pledge. Please try again."
+  }
+}

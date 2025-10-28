@@ -1,5 +1,7 @@
 import { Rocket } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { ConnectWallet } from './ConnectWallet';
+import { LanguageSwitcher } from './LanguageSwitcher';
 
 interface HeaderProps {
   onNavigate: (page: string) => void;
@@ -7,6 +9,8 @@ interface HeaderProps {
 }
 
 export function Header({ onNavigate, currentPage }: HeaderProps) {
+  const { t } = useTranslation();
+
   return (
     <header className="bg-gray-950/80 backdrop-blur-lg border-b border-white/10 sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -34,7 +38,7 @@ export function Header({ onNavigate, currentPage }: HeaderProps) {
                     : 'text-gray-400 hover:text-white hover:bg-white/5'
                 }`}
               >
-                Explorar
+                {t('header.explore')}
               </button>
               <button
                 onClick={() => onNavigate('create')}
@@ -44,7 +48,7 @@ export function Header({ onNavigate, currentPage }: HeaderProps) {
                     : 'text-gray-400 hover:text-white hover:bg-white/5'
                 }`}
               >
-                Crear Campaña
+                {t('header.createCampaign')}
               </button>
               <button
                 onClick={() => onNavigate('dashboard')}
@@ -54,12 +58,15 @@ export function Header({ onNavigate, currentPage }: HeaderProps) {
                     : 'text-gray-400 hover:text-white hover:bg-white/5'
                 }`}
               >
-                Mis Campañas
+                {t('header.myCampaigns')}
               </button>
             </nav>
           </div>
 
-          <ConnectWallet />
+          <div className="flex items-center space-x-3">
+            <LanguageSwitcher />
+            <ConnectWallet />
+          </div>
         </div>
       </div>
     </header>
