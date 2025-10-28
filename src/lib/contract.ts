@@ -3,6 +3,7 @@ import { CONTRACT_ADDRESS, SCROLL_TESTNET } from './scroll-config';
 
 export const CROWDFUND_ABI = [
   "constructor(uint256 _maxGoal, uint256 _maxPledge, bool _moderationRequired)",
+  "function owner() view returns (address)",
   "function MAX_GOAL() view returns (uint256)",
   "function MAX_PLEDGE() view returns (uint256)",
   "function moderationRequired() view returns (bool)",

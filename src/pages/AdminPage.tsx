@@ -137,7 +137,7 @@ export function AdminPage({ onNavigate }: AdminPageProps) {
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center space-x-3">
               <Shield className="w-8 h-8" />
-              <h1 className="text-3xl font-bold">Campaign Approval Panel</h1>
+              <h1 className="text-3xl font-bold">Campaign Management Panel</h1>
             </div>
             {isContractOwner && (
               <span className="px-4 py-2 bg-white/20 rounded-lg text-sm font-medium">
@@ -145,7 +145,7 @@ export function AdminPage({ onNavigate }: AdminPageProps) {
               </span>
             )}
           </div>
-          <p className="text-purple-100">Review and approve campaigns to allow users to pledge funds</p>
+          <p className="text-purple-100">Review campaigns and manage platform settings</p>
           <div className="mt-4 flex items-center space-x-2 text-sm">
             <span className="text-purple-200">Contract:</span>
             <code className="px-2 py-1 bg-black/20 rounded text-purple-100">
@@ -157,21 +157,19 @@ export function AdminPage({ onNavigate }: AdminPageProps) {
         <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl p-6 mb-6">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
-              <Clock className="w-5 h-5 text-cyan-400" />
-              <span className="text-white font-medium">Pending Approvals</span>
+              <CheckCircle className="w-5 h-5 text-green-400" />
+              <span className="text-white font-medium">Campaigns Status</span>
             </div>
             <span className="px-3 py-1 bg-cyan-500/20 text-cyan-400 rounded-full text-sm font-medium">
-              {campaigns.length} campaigns
+              {campaigns.length} unapproved
             </span>
           </div>
-          {moderationRequired && (
-            <div className="mt-4 p-3 bg-purple-500/10 border border-purple-500/30 rounded-lg">
-              <div className="flex items-center space-x-2 text-purple-300 text-sm">
-                <AlertCircle className="w-4 h-4" />
-                <span>Moderation is enabled - campaigns require approval before users can pledge</span>
-              </div>
+          <div className="mt-4 p-3 bg-green-500/10 border border-green-500/30 rounded-lg">
+            <div className="flex items-center space-x-2 text-green-300 text-sm">
+              <CheckCircle className="w-4 h-4" />
+              <span>Auto-approval is enabled - campaigns are automatically approved on creation</span>
             </div>
-          )}
+          </div>
         </div>
 
         {loading ? (
@@ -189,11 +187,17 @@ export function AdminPage({ onNavigate }: AdminPageProps) {
                   <div className="flex-1">
                     <div className="flex items-center space-x-3 mb-3">
                       <h3 className="text-xl font-bold text-white">Campaign #{campaign.id}</h3>
-                      <span className="px-3 py-1 bg-yellow-500/20 text-yellow-400 text-sm rounded-full">
-                        Pending Approval
-                      </span>
-                      {campaign.isActive && (
+                      {campaign.approved ? (
                         <span className="px-3 py-1 bg-green-500/20 text-green-400 text-sm rounded-full">
+                          Approved
+                        </span>
+                      ) : (
+                        <span className="px-3 py-1 bg-yellow-500/20 text-yellow-400 text-sm rounded-full">
+                          Pending Approval
+                        </span>
+                      )}
+                      {campaign.isActive && (
+                        <span className="px-3 py-1 bg-cyan-500/20 text-cyan-400 text-sm rounded-full">
                           Active
                         </span>
                       )}
@@ -269,10 +273,11 @@ export function AdminPage({ onNavigate }: AdminPageProps) {
                       <span>View</span>
                     </button>
 
-                    <button
-                      onClick={() => handleApprove(campaign.id)}
-                      disabled={processing === campaign.id}
-                      className="flex items-center justify-center space-x-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    {!campaign.approved && (
+                      <button
+                        onClick={() => handleApprove(campaign.id)}
+                        disabled={processing === campaign.id}
+                        className="flex items-center justify-center space-x-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       {processing === campaign.id ? (
                         <>
@@ -285,7 +290,8 @@ export function AdminPage({ onNavigate }: AdminPageProps) {
                           <span>Approve</span>
                         </>
                       )}
-                    </button>
+                      </button>
+                    )}
                   </div>
                 </div>
               </div>
@@ -293,9 +299,9 @@ export function AdminPage({ onNavigate }: AdminPageProps) {
           </div>
         ) : (
           <div className="text-center py-20">
-            <CheckCircle className="w-16 h-16 text-gray-600 mx-auto mb-4" />
-            <h3 className="text-xl font-semibold text-white mb-2">No Pending Campaigns</h3>
-            <p className="text-gray-400">All campaigns have been reviewed</p>
+            <CheckCircle className="w-16 h-16 text-green-600 mx-auto mb-4" />
+            <h3 className="text-xl font-semibold text-white mb-2">All Campaigns Auto-Approved</h3>
+            <p className="text-gray-400">New campaigns are automatically approved for pledging</p>
           </div>
         )}
       </div>
