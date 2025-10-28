@@ -1,15 +1,17 @@
 export const SCROLL_TESTNET = {
   chainId: 534351,
   chainIdHex: '0x8274f',
-  name: 'Scroll Alpha Testnet',
-  rpcUrl: 'https://alpha-rpc.scroll.io/l2',
-  blockExplorer: 'https://blockscout.scroll.io',
+  name: 'Scroll Sepolia Testnet',
+  rpcUrl: 'https://sepolia-rpc.scroll.io',
+  blockExplorer: 'https://sepolia.scrollscan.com',
   nativeCurrency: {
     name: 'Ether',
     symbol: 'ETH',
     decimals: 18,
   },
 };
+
+export const CONTRACT_ADDRESS = '0x0000000000000000000000000000000000000000';
 
 export const MAX_CAMPAIGN_GOAL = '2';
 export const MAX_PLEDGE_AMOUNT = '1';

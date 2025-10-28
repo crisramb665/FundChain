@@ -3,7 +3,9 @@ import { X, DollarSign, ExternalLink } from 'lucide-react';
 import { Campaign, supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
 import { useWeb3 } from '../contexts/Web3Context';
-import { parseAmount, getEthPrice, getUsdcPrice, calculateFiatEquivalent, getExplorerUrl } from '../lib/web3';
+import { useContract } from '../hooks/useContract';
+import { parseAmount, getEthPrice, getUsdcPrice, calculateFiatEquivalent } from '../lib/web3';
+import { getExplorerTxUrl } from '../lib/scroll-config';
 
 interface PledgeModalProps {
   campaign: Campaign;
@@ -13,12 +15,13 @@ interface PledgeModalProps {
 
 export function PledgeModal({ campaign, onClose, onSuccess }: PledgeModalProps) {
   const { user } = useAuth();
-  const { account, chainId, connectWallet } = useWeb3();
+  const { account, connectWallet } = useWeb3();
+  const { pledge, loading: contractLoading, error: contractError } = useContract();
   const [amount, setAmount] = useState('');
-  const [loading, setLoading] = useState(false);
   const [txHash, setTxHash] = useState<string | null>(null);
   const [fiatEstimate, setFiatEstimate] = useState('0.00');
   const [tokenPrice, setTokenPrice] = useState(0);
+  const loading = contractLoading;
 
   const presetAmounts = campaign.token === 'ETH'
     ? ['0.01', '0.05', '0.1', '0.5']
@@ -64,13 +67,18 @@ export function PledgeModal({ campaign, onClose, onSuccess }: PledgeModalProps) 
       return;
     }
 
-    setLoading(true);
     try {
+      const result = await pledge(campaign.contract_id || 0, amount);
+
+      if (!result) {
+        alert(contractError || 'Failed to pledge. Please try again.');
+        return;
+      }
+
+      setTxHash(result.txHash!);
+
       const decimals = campaign.token === 'ETH' ? 18 : 6;
       const amountWei = parseAmount(amount, decimals);
-
-      const mockTxHash = `0x${Math.random().toString(16).slice(2)}${Math.random().toString(16).slice(2)}${Math.random().toString(16).slice(2)}`;
-      setTxHash(mockTxHash);
 
       const { data: profile } = await supabase
         .from('profiles')
@@ -85,19 +93,17 @@ export function PledgeModal({ campaign, onClose, onSuccess }: PledgeModalProps) 
         });
       }
 
-      const { error: pledgeError } = await supabase.from('pledges').insert({
+      await supabase.from('pledges').insert({
         campaign_id: campaign.id,
         backer_id: user.id,
         amount: amountWei,
         token: campaign.token,
-        tx_hash: mockTxHash,
+        tx_hash: result.txHash,
         status: 'confirmed',
       });
 
-      if (pledgeError) throw pledgeError;
-
       const newTotal = (BigInt(campaign.total_pledged) + BigInt(amountWei)).toString();
-      const { error: campaignError } = await supabase
+      await supabase
         .from('campaigns')
         .update({
           total_pledged: newTotal,
@@ -105,23 +111,19 @@ export function PledgeModal({ campaign, onClose, onSuccess }: PledgeModalProps) 
         })
         .eq('id', campaign.id);
 
-      if (campaignError) throw campaignError;
-
       await supabase.from('activity_log').insert({
         campaign_id: campaign.id,
         user_id: user.id,
         event_type: 'pledged',
-        data: { amount, token: campaign.token },
+        data: { amount, token: campaign.token, txHash: result.txHash },
       });
 
       setTimeout(() => {
-        alert('Pledge successful!');
         onSuccess();
-      }, 1000);
+      }, 2000);
     } catch (error) {
       console.error('Error pledging:', error);
       alert('Failed to pledge. Please try again.');
-      setLoading(false);
     }
   };
 
