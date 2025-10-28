@@ -142,14 +142,56 @@ export function Web3Provider({ children }: { children: ReactNode }) {
       }
 
       if (!user) {
-        const { data: authData, error: authError } = await supabase.auth.signInAnonymously();
-        if (authError) {
-          console.error('Error signing in anonymously:', authError);
-        } else if (authData.user) {
-          await supabase.from('profiles').insert({
-            id: authData.user.id,
-            wallet_address: accounts[0],
+        console.log('No user session found, creating one...');
+        const email = `${accounts[0].toLowerCase()}@wallet.local`;
+        const password = accounts[0].toLowerCase();
+
+        let authData;
+        const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
+          email,
+          password,
+        });
+
+        if (signInError) {
+          console.log('User does not exist, creating new account...');
+          const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
+            email,
+            password,
+            options: {
+              data: {
+                wallet_address: accounts[0],
+              },
+            },
           });
+
+          if (signUpError) {
+            console.error('Error creating user:', signUpError);
+            setError('Failed to create user session');
+            return;
+          }
+          authData = signUpData;
+        } else {
+          authData = signInData;
+        }
+
+        if (authData.user) {
+          const { data: existingProfile } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('id', authData.user.id)
+            .maybeSingle();
+
+          if (!existingProfile) {
+            await supabase.from('profiles').insert({
+              id: authData.user.id,
+              wallet_address: accounts[0],
+            });
+          } else {
+            await supabase
+              .from('profiles')
+              .update({ wallet_address: accounts[0] })
+              .eq('id', authData.user.id);
+          }
         }
       } else {
         await updateProfileWallet(accounts[0]);
