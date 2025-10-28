@@ -1,10 +1,7 @@
-import { useEffect, useState } from 'react';
 import { Rocket, Shield } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { ConnectWallet } from './ConnectWallet';
 import { LanguageSwitcher } from './LanguageSwitcher';
-import { useWeb3 } from '../contexts/Web3Context';
-import { getContractOwner } from '../lib/contract';
 
 interface HeaderProps {
   onNavigate: (page: string) => void;
@@ -13,26 +10,6 @@ interface HeaderProps {
 
 export function Header({ onNavigate, currentPage }: HeaderProps) {
   const { t } = useTranslation();
-  const { account } = useWeb3();
-  const [isContractOwner, setIsContractOwner] = useState(false);
-
-  useEffect(() => {
-    checkIfOwner();
-  }, [account]);
-
-  const checkIfOwner = async () => {
-    if (!account) {
-      setIsContractOwner(false);
-      return;
-    }
-
-    const owner = await getContractOwner();
-    if (owner && account.toLowerCase() === owner.toLowerCase()) {
-      setIsContractOwner(true);
-    } else {
-      setIsContractOwner(false);
-    }
-  };
 
   return (
     <header className="bg-gray-950/80 backdrop-blur-lg border-b border-white/10 sticky top-0 z-50">

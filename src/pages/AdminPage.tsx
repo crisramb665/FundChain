@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
 import { Shield, CheckCircle, XCircle, Eye, Clock, AlertCircle, Lock } from 'lucide-react';
-import { fetchAllCampaigns, approveCampaignOnChain, checkModerationRequired, getContractOwner, Campaign } from '../lib/contract';
+import { fetchAllCampaigns, approveCampaignOnChain, checkModerationRequired, Campaign } from '../lib/contract';
 import { useWeb3 } from '../contexts/Web3Context';
 import { ethers } from 'ethers';
-import { CONTRACT_ADDRESS } from '../lib/scroll-config';
+import { CONTRACT_ADDRESS, CONTRACT_OWNER } from '../lib/scroll-config';
 
 interface AdminPageProps {
   onNavigate: (page: string, data?: any) => void;
@@ -34,8 +34,7 @@ export function AdminPage({ onNavigate }: AdminPageProps) {
     const modRequired = await checkModerationRequired();
     setModerationRequired(modRequired);
 
-    const owner = await getContractOwner();
-    if (owner && account.toLowerCase() === owner.toLowerCase()) {
+    if (account.toLowerCase() === CONTRACT_OWNER.toLowerCase()) {
       setIsContractOwner(true);
     } else {
       setIsContractOwner(false);

@@ -12,6 +12,7 @@ export const SCROLL_TESTNET = {
 };
 
 export const CONTRACT_ADDRESS = '0xD6850C4bC84411bC3717F127fC38C447Fe82Fc14';
+export const CONTRACT_OWNER = '0xbc6b93f3aba28cd04b96c50b0f0ac53a24564718';
 
 export const MAX_CAMPAIGN_GOAL = '2';
 export const MAX_PLEDGE_AMOUNT = '1';
